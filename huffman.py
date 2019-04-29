@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.misc import imread,imresize
+from imageio  import imread
 import matplotlib.pyplot as plt
 from operator import itemgetter, attrgetter
 import queue
@@ -10,7 +10,7 @@ class Node:
 		self.code = None
 		self.data = None
 		self.left = None
-		self.right = None 	# the color (the bin value) is only required in the leaves
+		self.right = None 	
 	def __lt__(self, other):
 		if (self.prob < other.prob):		# define rich comparison methods for sorting in the priority queue
 			return 1
@@ -22,12 +22,12 @@ class Node:
 		else:
 			return 0
 def rgb2gray(img):
-	gray_img = np.rint(img[:,:,0]*0.2989 + img[:,:,1]*0.5870 + img[:,:,2]*0.1140)
-	gray_img = gray_img.astype(int)
+	gray_img = np.rint(img[:,:,0]*0.2989 + img[:,:,1]*0.5870 + img[:,:,2]*0.1140) #rounding of array
+	gray_img = gray_img.astype(int) #casting the stream into int
 	return gray_img
 
 def get2smallest(data):			# can be used instead of inbuilt function get(). was not used in  implementation
-    first = second = 1;
+    first = second = 1
     fid=sid=0
     for idx,element in enumerate(data):
         if (element < first):
@@ -79,17 +79,16 @@ def huffman_traversal(root_node,tmp_array,f):		# traversal of the tree to genera
 	return
 
 # Read an bmp image into a numpy array
-img = imread('tiger.bmp')
-img = imresize(img,10)		# resize to 10% (not strictly necessary - done for faster computation)
+img = np.array(imread('tiger.bmp'))
 
 # convert to grayscale
 gray_img = rgb2gray(img)
 
 # compute histogram of pixels
 hist = np.bincount(gray_img.ravel(),minlength=256)
-
+plt.hist(hist)
+plt.show()
 probabilities = hist/np.sum(hist)		# a priori probabilities from frequencies
-
 root_node = tree(probabilities)			# create the tree using the probs.
 tmp_array = np.ones([64],dtype=int)
 huffman_traversal.output_bits = np.empty(256,dtype=int) 
